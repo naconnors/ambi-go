@@ -11,12 +11,13 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-// Use global database for now, this should be changed later
+// TODO: Use global database for now, this should be changed later
 var db *sql.DB
 
 func main() {
 
 	var err error
+	//TODO: This should be moved to its own package
 	db, err = sql.Open("pgx", "postgres://postgres:postgres@localhost/ambi_go_dev")
 	if err != nil {
 		log.Fatal("Unable to connect to database")
@@ -30,11 +31,13 @@ func main() {
 
 	router := httprouter.New()
 
-	router.HandlerFunc(http.MethodPost, "/readings/add", addReading)
+	//TODO: Move to its own router package
+	router.HandlerFunc(http.MethodPost, "/api/readings/add", addReading)
 
 	log.Fatal(http.ListenAndServe(":4000", router))
 }
 
+// TODO: Move to its own model package
 type AirPurity string
 
 const (
@@ -52,6 +55,7 @@ type Reading struct {
 	AirPurity         AirPurity
 }
 
+// TODO: Move to its own handler package
 func addReading(w http.ResponseWriter, r *http.Request) {
 	var reading Reading
 	err := json.NewDecoder(r.Body).Decode(&reading)

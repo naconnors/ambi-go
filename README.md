@@ -1,6 +1,6 @@
-# Ambi-go
+# Ambi
 
-Ambi-go is an Golang-based web service that presents a frontend to display real time ambient room conditions
+Ambi is an Golang-based web service that presents a frontend to display real time ambient room conditions
 like temperature, humidity, pressure, air quality, dust concentration, etc. It uses the Bulma CSS framework
 for some attractive base UI components.
 ## Install Postgresql
@@ -14,7 +14,7 @@ Keep the local db instance running on port 5432 and make sure to set up a postgr
 
 `$ sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'postgres';"`
 
-To allow Ambi-go to access your Postgresql cluster via localhost, make sure your `/etc/postgresql/14/main/pg_hba.conf` looks like the following:
+To allow Ambi to access your Postgresql cluster via localhost, make sure your `/etc/postgresql/14/main/pg_hba.conf` looks like the following:
 
 ```
 # Database administrative login by Unix domain socket
@@ -35,7 +35,7 @@ local   replication     all                                     peer
 host    replication     all             127.0.0.1/32            scram-sha-256
 host    replication     all             ::1/128                 scram-sha-256
 ```
-## Starting the Ambi-go
+## Starting the Ambi
 
 To start your server:
 
