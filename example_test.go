@@ -12,3 +12,12 @@ func TestExample(t *testing.T) {
 		t.Errorf("expected '%d' but got '%d'", expected, actual)
 	}
 }
+
+func TestExampleAgain(t *testing.T) {
+	expected := 1
+	actual := 1
+
+	if actual != expected {
+		t.Errorf("expected '%d' but got '%d'", expected, actual)
+	}
+}
