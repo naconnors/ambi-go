@@ -42,7 +42,7 @@ To start your server:
   * Install dependencies with `go mod vendor`
   * Create database `ambi_go_dev`
   * Create table using migration in same named directory
-  * Start server with `go run main.go`
+  * Start server with `go run ./...`
 
 Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 ## License
