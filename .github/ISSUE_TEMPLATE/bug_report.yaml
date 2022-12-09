@@ -1,0 +1,48 @@
+name: Bug Report
+description: File a bug report for ambi-go
+title: "[Bug]: "
+labels: ["bug", "triage"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: input
+    id: contact
+    attributes:
+      label: Contact Details
+      description: How can we get in touch with you if we need more info?
+      placeholder: ex. email@example.com
+    validations:
+      required: false
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe the issue here.
+      placeholder: Tell us what you see!
+      value: "A bug happened!"
+    validations:
+      required: true
+  - type: textarea
+    id: how-running
+    attributes:
+      label: How are you trying to run the app?
+      description: Describe the commands you are using to run the app.
+    validations:
+      required: true
+  - type: input
+    id: hardware
+    attributes:
+      label: What OS and version/distro are you running on?
+      placeholder: ex. Windows 98, Arch Linux, etc.
+    validations:
+      required: true
+  - type: input
+    id: go-version
+    attributes:
+      label: What version of Go are you using?
+      description: Run `go version` and tell us what it says.
+    validations:
+      required: true
