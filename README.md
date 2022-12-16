@@ -35,18 +35,16 @@ local   replication     all                                     peer
 host    replication     all             127.0.0.1/32            scram-sha-256
 host    replication     all             ::1/128                 scram-sha-256
 ```
-## Starting the Ambi
+## Starting Ambi
 
 To start your server:
-
-  * Install dependencies with `go mod vendor`
   * Create database `ambi_go_dev`
-  * Create table using migration in same named directory
-  * Start server with `go run main.go`
+  * Run `make migrate-up` to create required tables
+  * Start server with `make run`
 
 Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 ## License
 
-This project is licensed under the [BSD + Patent license](https://opensource.org/licenses/BSDplusPatent).
+This project is licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
 Any submissions to this project (e.g. as Pull Requests) must be made available under these terms.
