@@ -38,7 +38,8 @@ host    replication     all             ::1/128                 scram-sha-256
 ## Starting Ambi
 
 To start your server:
-  * Create database `ambi_go_dev`
+  * Run `make setup`
+    - This will create a database called `ambi_go_dev`
   * Run `make migrate-up` to create required tables
   * Start server with `make run`
 
