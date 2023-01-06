@@ -2,13 +2,11 @@ package main
 
 import (
 	"database/sql"
-	"encoding/json"
-	"fmt"
 	"log"
-	"net/http"
+	"strconv"
 
+	"github.com/gofiber/fiber/v2"
 	_ "github.com/jackc/pgx/v5/stdlib"
-	"github.com/julienschmidt/httprouter"
 )
 
 // TODO: Use global database for now, this should be changed later
@@ -29,12 +27,13 @@ func main() {
 
 	defer db.Close()
 
-	router := httprouter.New()
+	app := fiber.New()
 
-	//TODO: Move to its own router package
-	router.HandlerFunc(http.MethodPost, "/api/readings/add", addReading)
+	app.Post("/api/readings/add", addReading)
 
-	log.Fatal(http.ListenAndServe(":4000", router))
+	app.Listen(":4000")
+
+	log.Fatal("Failed to start server")
 }
 
 // TODO: Move to its own model package
@@ -48,31 +47,30 @@ const (
 )
 
 type Reading struct {
-	Temperature       float32
-	Humidity          float32
-	DustConcentration float32
-	Pressure          int32
-	AirPurity         AirPurity
+	Temperature       float32   `json:"temperature"`
+	Humidity          float32   `json:"humidity"`
+	DustConcentration float32   `json:"dust_concentration"`
+	Pressure          int32     `json:"pressure"`
+	AirPurity         AirPurity `json:"air_purity"`
 }
 
 // TODO: Move to its own handler package
-func addReading(w http.ResponseWriter, r *http.Request) {
+func addReading(c *fiber.Ctx) error {
 	var reading Reading
-	err := json.NewDecoder(r.Body).Decode(&reading)
-
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+	if err := c.BodyParser(&reading); err != nil {
+		return err
 	}
 
 	stmt := `INSERT INTO readings (temperature, humidity, dust_concentration, pressure, air_purity) 
 	VALUES($1, $2, $3, $4, $5) RETURNING id`
 
 	var id int
-	err = db.QueryRow(stmt, reading.Temperature, reading.Humidity, reading.DustConcentration, reading.Pressure, reading.AirPurity).Scan(&id)
+	err := db.QueryRow(stmt, reading.Temperature, reading.Humidity, reading.DustConcentration, reading.Pressure, reading.AirPurity).Scan(&id)
 	if err != nil {
-		log.Fatal("Error inserting reading into database")
+		return err
 	}
 
-	fmt.Fprintf(w, "Record inserted: %v", id)
+	c.SendString("Record inserted: " + strconv.Itoa(id))
+
+	return nil
 }
