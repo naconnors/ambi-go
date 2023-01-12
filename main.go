@@ -31,9 +31,7 @@ func main() {
 
 	app.Post("/api/readings/add", addReading)
 
-	app.Listen(":4000")
-
-	log.Fatal("Failed to start server")
+	log.Fatal(app.Listen(":4000"))
 }
 
 // TODO: Move to its own model package
