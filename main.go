@@ -1,12 +1,17 @@
 package main
 
 import (
+	"bufio"
 	"database/sql"
+	"encoding/json"
+	"fmt"
 	"log"
 	"strconv"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/valyala/fasthttp"
 )
 
 // TODO: Use global database for now, this should be changed later
@@ -30,8 +35,12 @@ func main() {
 	app := fiber.New()
 
 	app.Post("/api/readings/add", addReading)
+	app.Get("/sse", events)
+	app.Static("/", "./static")
 
-	log.Fatal(app.Listen(":4000"))
+	app.Listen(":4000")
+
+	log.Fatal("Failed to start server")
 }
 
 // TODO: Move to its own model package
@@ -71,4 +80,65 @@ func addReading(c *fiber.Ctx) error {
 	c.SendString("Record inserted: " + strconv.Itoa(id))
 
 	return nil
+}
+
+func events(c *fiber.Ctx) error {
+	c.Set("Content-Type", "text/event-stream")
+	c.Set("Cache-Control", "no-cache")
+	c.Set("Connection", "keep-alive")
+	c.Set("Transfer-Encoding", "chunked")
+
+	c.Context().SetBodyStreamWriter(fasthttp.StreamWriter(func(w *bufio.Writer) {
+		for {
+			reading, err := getLatestReading()
+
+			if err != nil {
+				fmt.Printf("Error while getting reading data: %v", err)
+				return
+			}
+
+			data, err := json.Marshal(reading)
+
+			if err != nil {
+				fmt.Printf("Error while marshaling json: %v", err)
+				break
+			}
+
+			fmt.Printf("data: %s\n", string(data))
+			fmt.Fprintf(w, "data: %s\n\n", string(data))
+
+			err = w.Flush()
+			if err != nil {
+				// Refreshing page in web browser will establish a new
+				// SSE connection, but only (the last) one is alive, so
+				// dead connections must be closed here.
+				fmt.Printf("Error while flushing: %v. Closing http connection.\n", err)
+				break
+			}
+			time.Sleep(2 * time.Second)
+		}
+	}))
+
+	return nil
+}
+
+func getLatestReading() (*Reading, error) {
+	var reading Reading
+	var id int
+	row, err := db.Query("SELECT * FROM readings ORDER BY id DESC LIMIT 1")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer row.Close()
+
+	row.Next()
+	err = row.Scan(&id, &reading.Temperature, &reading.Humidity, &reading.DustConcentration, &reading.Pressure, &reading.AirPurity)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return &reading, nil
 }
